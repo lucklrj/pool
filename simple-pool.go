@@ -18,7 +18,7 @@ type Pool struct {
 	mu              sync.RWMutex
 
 	CreateClient  func() interface{}
-	DestroyClient func(coon *Coon)
+	DestroyClient func(client interface{})
 	Pools         chan *Coon
 }
 
@@ -66,7 +66,7 @@ func (p *Pool) Get() (*Coon, error) {
 }
 func (p *Pool) Put(c *Coon) {
 	if len(p.Pools) > p.MaxOpenConns {
-		p.DestroyClient(c)
+		p.DestroyClient(c.Client)
 	} else {
 		p.mu.RLock()
 		p.Pools <- c
@@ -82,7 +82,7 @@ func (p *Pool)Close(){
 	if pools != nil {
 		close(pools)
 		for conn := range pools {
-			p.DestroyClient(conn)
+			p.DestroyClient(conn.Client)
 		}
 	}
 }
