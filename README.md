@@ -78,6 +78,8 @@ func main() {
 
  * [Lucklrj](https://github.com/lucklrj)
 
+## License
 
+The MIT License (MIT) - see LICENSE for more details
 
 
