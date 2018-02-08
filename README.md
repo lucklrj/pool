@@ -1,4 +1,4 @@
-# Pool 
+# Pool [![Build Status](http://img.shields.io/travis/fatih/pool.svg?style=flat-square)](https://travis-ci.org/fatih/pool)
 
 
 Pool is a very simple connection pool for connections interface. It can be used to
