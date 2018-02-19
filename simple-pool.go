@@ -57,6 +57,7 @@ func (p *Pool) Get() (*Coon, error) {
 			return nil, errors.New("Get connection time out")
 		case client := <-p.Pools:
 			if client.LeftTime.Unix() < time.Now().Unix() {
+				p.DestroyClient(client)
 				continue
 			} else {
 				return client, nil
