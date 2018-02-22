@@ -55,12 +55,12 @@ func (p *Pool) Get() (*Coon, error) {
 			}
 		case <-time.After(time.Duration(p.ConnTimeOut)):
 			return nil, errors.New("Get connection time out")
-		case client := <-p.Pools:
-			if client.LeftTime.Unix() < time.Now().Unix() {
-				p.DestroyClient(client)
+		case coon := <-p.Pools:
+			if coon.LeftTime.Unix() < time.Now().Unix() {
+				p.DestroyClient(coon.Client)
 				continue
 			} else {
-				return client, nil
+				return coon, nil
 			}
 		}
 	}
