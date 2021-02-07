@@ -46,18 +46,18 @@ func (p *Pool) Init() error {
 	}
 }
 func (p *Pool) Get() (*Coon, error) {
-	if len(p.Pools) < 1 {
+	//线程池=0，但未达到max，直接创建
+	if len(p.Pools)==0 && p.WorkNum < p.MaxOpenConns {
 		p.Create()
-		return <-p.Pools, nil
 	}
 	for {
 		select {
-		case <-time.After(time.Duration(p.ConnTimeOut / 1000)):
-			if len(p.Pools) < p.MaxOpenConns {
-				p.Create()
-			}
+		//case <-time.After(time.Duration(p.ConnTimeOut / 1000)):
+		//	if len(p.Pools) < p.MaxOpenConns {
+		//		p.Create()
+		//	}
 		case <-time.After(time.Duration(p.ConnTimeOut)):
-			return nil, errors.New("Get connection time out")
+			return nil, errors.New("get connection time out")
 		case coon := <-p.Pools:
 			if coon.LeftTime.Unix() < time.Now().Unix() {
 				p.DestroyClient(coon.Client)
