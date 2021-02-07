@@ -15,6 +15,7 @@ type Pool struct {
 	MaxOpenConns    int
 	ConnMaxLifeTime int
 	ConnTimeOut     int
+	WorkNum int
 	mu              sync.RWMutex
 
 	CreateClient  func() interface{}
@@ -23,6 +24,7 @@ type Pool struct {
 }
 
 func (p *Pool) Create() {
+	p.WorkNum++
 	client := p.CreateClient()
 	lefttime := time.Now().Add(time.Duration(p.ConnMaxLifeTime) * time.Second)
 
@@ -35,6 +37,7 @@ func (p *Pool) Create() {
 }
 
 func (p *Pool) Init() error {
+	p.WorkNum=0
 	if p.MaxOpenConns > 0 {
 		p.Pools = make(chan *Coon, p.MaxOpenConns)
 		return nil
@@ -58,6 +61,7 @@ func (p *Pool) Get() (*Coon, error) {
 		case coon := <-p.Pools:
 			if coon.LeftTime.Unix() < time.Now().Unix() {
 				p.DestroyClient(coon.Client)
+				p.WorkNum--
 				continue
 			} else {
 				return coon, nil
