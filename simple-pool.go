@@ -15,7 +15,7 @@ type Pool struct {
 	MaxOpenConns    int
 	ConnMaxLifeTime int
 	ConnTimeOut     int
-	WorkNum int
+	WorkNum         int
 	mu              sync.RWMutex
 
 	CreateClient  func() interface{}
@@ -37,7 +37,7 @@ func (p *Pool) Create() {
 }
 
 func (p *Pool) Init() error {
-	p.WorkNum=0
+	p.WorkNum = 0
 	if p.MaxOpenConns > 0 {
 		p.Pools = make(chan *Coon, p.MaxOpenConns)
 		return nil
@@ -47,7 +47,7 @@ func (p *Pool) Init() error {
 }
 func (p *Pool) Get() (*Coon, error) {
 	//线程池=0，但未达到max，直接创建
-	if len(p.Pools)==0 && p.WorkNum < p.MaxOpenConns {
+	if len(p.Pools) == 0 && p.WorkNum < p.MaxOpenConns {
 		p.Create()
 	}
 	for {
@@ -56,7 +56,7 @@ func (p *Pool) Get() (*Coon, error) {
 		//	if len(p.Pools) < p.MaxOpenConns {
 		//		p.Create()
 		//	}
-		case <-time.After(time.Duration(p.ConnTimeOut)):
+		case <-time.After(time.Duration(p.ConnTimeOut * time.Second)):
 			return nil, errors.New("get connection time out")
 		case coon := <-p.Pools:
 			if coon.LeftTime.Unix() < time.Now().Unix() {
@@ -78,12 +78,12 @@ func (p *Pool) Put(c *Coon) {
 		p.mu.RUnlock()
 	}
 }
-func (p *Pool)Close(){
+func (p *Pool) Close() {
 	p.mu.Lock()
 	pools := p.Pools
 	p.Pools = nil
 	p.mu.Unlock()
-	
+
 	if pools != nil {
 		close(pools)
 		for conn := range pools {
