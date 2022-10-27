@@ -56,7 +56,7 @@ func (p *Pool) Get() (*Coon, error) {
 		//	if len(p.Pools) < p.MaxOpenConns {
 		//		p.Create()
 		//	}
-		case <-time.After(time.Duration(p.ConnTimeOut * time.Second)):
+		case <-time.After(time.Duration(p.ConnTimeOut) * time.Second):
 			return nil, errors.New("get connection time out")
 		case coon := <-p.Pools:
 			if coon.LeftTime.Unix() < time.Now().Unix() {
