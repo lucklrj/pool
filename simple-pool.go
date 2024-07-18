@@ -47,7 +47,7 @@ func (p *Pool) Init() error {
 }
 func (p *Pool) Get() (*Coon, error) {
 	//线程池=0，但未达到max，直接创建
-	if len(p.Pools) == 0 && p.WorkNum < p.MaxOpenConns {
+	if p.WorkNum < p.MaxOpenConns {
 		p.Create()
 	}
 	for {
